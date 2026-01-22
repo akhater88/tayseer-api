@@ -70,7 +70,7 @@ class User extends Authenticatable
         parent::boot();
 
         static::creating(function ($user) {
-            if (empty($user->slug)) {
+            if (empty($user->slug) && !empty($user->username)) {
                 $user->slug = static::generateUniqueSlug($user->username);
             }
         });
@@ -80,9 +80,9 @@ class User extends Authenticatable
      * Generate a unique slug from username
      * Format: username-xxxx (e.g., ahmed-m4k9)
      */
-    public static function generateUniqueSlug(string $username): string
+    public static function generateUniqueSlug(?string $username): string
     {
-        $baseSlug = Str::slug($username);
+        $baseSlug = Str::slug($username ?: 'user');
         $randomSuffix = Str::lower(Str::random(4));
         $slug = "{$baseSlug}-{$randomSuffix}";
 
