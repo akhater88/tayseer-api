@@ -58,6 +58,7 @@ return array(
     'App\\Models\\UserProfile' => $baseDir . '/app/Models/UserProfile.php',
     'App\\Models\\WorkField' => $baseDir . '/app/Models/WorkField.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
+    'App\\Providers\\Filament\\SuperAdminPanelProvider' => $baseDir . '/app/Providers/Filament/SuperAdminPanelProvider.php',
     'App\\Services\\InfobipService' => $baseDir . '/app/Services/InfobipService.php',
     'App\\Services\\MatchingService' => $baseDir . '/app/Services/MatchingService.php',
     'App\\Services\\OtpService' => $baseDir . '/app/Services/OtpService.php',

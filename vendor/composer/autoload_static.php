@@ -735,6 +735,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'App\\Models\\UserProfile' => __DIR__ . '/../..' . '/app/Models/UserProfile.php',
         'App\\Models\\WorkField' => __DIR__ . '/../..' . '/app/Models/WorkField.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
+        'App\\Providers\\Filament\\SuperAdminPanelProvider' => __DIR__ . '/../..' . '/app/Providers/Filament/SuperAdminPanelProvider.php',
         'App\\Services\\InfobipService' => __DIR__ . '/../..' . '/app/Services/InfobipService.php',
         'App\\Services\\MatchingService' => __DIR__ . '/../..' . '/app/Services/MatchingService.php',
         'App\\Services\\OtpService' => __DIR__ . '/../..' . '/app/Services/OtpService.php',
