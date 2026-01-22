@@ -8,7 +8,7 @@ use App\Events\InterestSent;
 use App\Events\MatchCreated;
 use App\Models\Block;
 use App\Models\Interest;
-use App\Models\Match;
+use App\Models\Match as MatchModel;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -96,7 +96,7 @@ class MatchingService
             $match = null;
             if ($reverseInterest) {
                 // Create match
-                $match = Match::createForUsers($interest->sender, $interest->receiver);
+                $match = MatchModel::createForUsers($interest->sender, $interest->receiver);
                 event(new MatchCreated($match));
             }
 

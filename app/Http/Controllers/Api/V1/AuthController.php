@@ -95,6 +95,7 @@ class AuthController extends Controller
         $user = User::create([
             'username' => $request->username,
             'phone' => $request->phone,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
             'gender' => $request->gender,
             'user_type' => UserType::Member,
@@ -103,21 +104,51 @@ class AuthController extends Controller
             'phone_verified_at' => now(),
         ]);
 
-        // Create profile
-        $user->profile()->create([
+        // Create profile with all fields
+        $profileData = [
+            // Private
+            'full_name' => $request->full_name,
+
+            // Demographics
             'date_of_birth' => $request->date_of_birth,
             'nationality_id' => $request->nationality_id,
             'country_id' => $request->country_id,
             'city_id' => $request->city_id,
+
+            // Marital
             'marital_status' => $request->marital_status,
             'number_of_children' => $request->number_of_children ?? 0,
+
+            // Physical
+            'height_cm' => $request->height_cm,
+            'weight_kg' => $request->weight_kg,
+            'skin_color' => $request->skin_color,
+            'body_type' => $request->body_type,
+
+            // Religious
             'religious_level' => $request->religious_level,
             'prayer_level' => $request->prayer_level,
-            'smoking' => $request->smoking ?? 'no',
-            'hijab_type' => $request->hijab_type,
-            'beard_type' => $request->beard_type,
+            'smoking' => $request->smoking,
+
+            // Career
+            'education_level' => $request->education_level,
+            'work_field_id' => $request->work_field_id,
+            'job_title' => $request->job_title,
+
+            // Bio
             'about_me' => $request->about_me,
-        ]);
+            'partner_preferences' => $request->partner_preferences,
+        ];
+
+        // Gender-specific fields
+        if ($user->isMale()) {
+            $profileData['beard_type'] = $request->beard_type;
+            $profileData['number_of_wives'] = $request->number_of_wives ?? 0;
+        } else {
+            $profileData['hijab_type'] = $request->hijab_type;
+        }
+
+        $user->profile()->create($profileData);
 
         // Calculate profile completion
         $user->profile->updateCompletion();
@@ -257,6 +288,77 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'user' => new UserResource($user),
+        ]);
+    }
+
+    /**
+     * Check username availability
+     */
+    public function checkUsername(Request $request): JsonResponse
+    {
+        $request->validate([
+            'username' => 'required|string|min:4|max:15',
+        ]);
+
+        $username = strtolower($request->username);
+
+        // Validation rules
+        $errors = [];
+
+        // Check format: alphanumeric + dots + underscores
+        if (!preg_match('/^[a-zA-Z0-9._]+$/', $username)) {
+            $errors[] = 'يجب أن يحتوي اسم المستخدم على حروف وأرقام ونقاط وشرطات سفلية فقط';
+        }
+
+        // Cannot start or end with dot
+        if (str_starts_with($username, '.') || str_ends_with($username, '.')) {
+            $errors[] = 'لا يمكن أن يبدأ أو ينتهي اسم المستخدم بنقطة';
+        }
+
+        // No consecutive dots
+        if (str_contains($username, '..')) {
+            $errors[] = 'لا يمكن استخدام نقاط متتالية';
+        }
+
+        // Check profanity (Arabic + English)
+        $profanityWords = [
+            // English
+            'fuck', 'shit', 'ass', 'dick', 'bitch', 'porn', 'sex', 'xxx',
+            // Arabic transliteration
+            'sharmouta', 'sharmota', 'kalb', 'khanzeir', 'manyak', 'kuss', 'air',
+        ];
+
+        foreach ($profanityWords as $word) {
+            if (stripos($username, $word) !== false) {
+                $errors[] = 'اسم المستخدم يحتوي على كلمات غير لائقة';
+                break;
+            }
+        }
+
+        if (!empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'available' => false,
+                'message' => $errors[0],
+                'errors' => $errors,
+            ], 422);
+        }
+
+        // Check if already taken
+        $exists = User::where('username', $username)->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => true,
+                'available' => false,
+                'message' => 'اسم المستخدم مستخدم مسبقاً',
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'available' => true,
+            'message' => 'اسم المستخدم متاح',
         ]);
     }
 }
