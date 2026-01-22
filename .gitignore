@@ -18,7 +18,7 @@
 /public/storage
 /storage/*.key
 /storage/pail
-
+/vendor
 /database/*.sqlite
 /database/*.sqlite-journal
 Homestead.json
