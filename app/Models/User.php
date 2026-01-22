@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Match as MatchModel;
 
 class User extends Authenticatable
 {
@@ -123,12 +124,12 @@ class User extends Authenticatable
 
     public function matchesAsUser1(): HasMany
     {
-        return $this->hasMany(Match::class, 'user_1_id');
+        return $this->hasMany(MatchModel::class, 'user_1_id');
     }
 
     public function matchesAsUser2(): HasMany
     {
-        return $this->hasMany(Match::class, 'user_2_id');
+        return $this->hasMany(MatchModel::class, 'user_2_id');
     }
 
     public function favorites(): HasMany
@@ -285,7 +286,7 @@ class User extends Authenticatable
 
     public function hasMutualInterestWith(User $user): bool
     {
-        return Match::where(function ($q) use ($user) {
+        return MatchModel::where(function ($q) use ($user) {
             $q->where('user_1_id', $this->id)->where('user_2_id', $user->id);
         })->orWhere(function ($q) use ($user) {
             $q->where('user_1_id', $user->id)->where('user_2_id', $this->id);
@@ -297,7 +298,7 @@ class User extends Authenticatable
      */
     public function getAllMatches()
     {
-        return Match::where('user_1_id', $this->id)
+        return MatchModel::where('user_1_id', $this->id)
             ->orWhere('user_2_id', $this->id);
     }
 }
